@@ -1,0 +1,6 @@
+services:
+  flowerhub-api:
+    build: .
+    ports:
+      - "53474:53474"
+    restart: unless-stopped
