@@ -1,0 +1,33 @@
+[project]
+name = "flowerhubfrontend"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "NKTKLN",email = "nktkln@nktkln.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "nicegui (>=2.17.0,<3.0.0)",
+    "fastapi (>=0.115.12,<0.116.0)",
+    "pytest (>=8.3.5,<9.0.0)",
+    "selenium (>=4.32.0,<5.0.0)",
+    "pytest-asyncio (>=0.26.0,<0.27.0)",
+    "pytest-selenium (>=4.1.0,<5.0.0)",
+    "playwright (>=1.52.0,<2.0.0)",
+    "pytest-playwright (>=0.7.0,<0.8.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pytest-asyncio = "^0.26.0"
+selenium = "^4.32.0"
+pytest-selenium = "^4.1.0"
+webdriver-manager = "^4.0.2"
+
