@@ -25,3 +25,9 @@ def get_seller_orders(token: str) -> dict:
     with httpx.Client() as client:
         response = client.get(f"{API_URL}/seller/orders", headers={"X-Token": token})
     return response.json()
+
+def update_order_status(token: str, order_id: int) -> dict:
+    check_and_refresh_token(token)
+    with httpx.Client() as client:
+        response = client.get(f"{API_URL}/seller/change_order_status/{order_id}", headers={"X-Token": token})
+    return response.json()

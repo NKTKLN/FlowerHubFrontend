@@ -1,7 +1,6 @@
 from nicegui import app, ui
 from app.utils import USER_AUTH_TOKEN, IS_LOGGED_IN, IS_USER_SELLER, IS_MOBILE, IS_USER_ADMIN
-from app.services import get_orders, get_order_by_id, get_flower_data, get_seller_orders, get_profile_by_id, get_admin_orders
-from app.components import navbar
+from app.services import get_orders, get_order_by_id, get_flower_data, get_seller_orders, get_profile_by_id, get_admin_orders, update_order_status
 
 @ui.page('/orders')
 def orders_page():
@@ -38,6 +37,7 @@ def orders_page():
                         with ui.row().classes('justify-between w-full items-center'):
                             ui.label(f'Заказ #{order["order_id"]}').classes('text-lg font-semibold text-primary')
                             ui.label(order['order_date']).classes('text-sm text-gray-500')
+                            ui.label('Закрыт' if order['is_closed'] else 'Открыт').classes('text-sm' + (' text-red-500' if order['is_closed'] else ' text-green-500'))
 
                         items = order.get("items", [])
                         item_descriptions = []
@@ -94,6 +94,7 @@ def seller_orders_page():
                         with ui.row().classes('justify-between w-full items-center'):
                             ui.label(f'Заказ #{order["order_id"]}').classes('text-lg font-semibold text-primary')
                             ui.label(order['order_date']).classes('text-sm text-gray-500')
+                            ui.label('Закрыт' if order['is_closed'] else 'Открыт').classes('text-sm' + (' text-red-500' if order['is_closed'] else ' text-green-500'))
 
                         items = order.get("items", [])
                         item_descriptions = []
@@ -142,6 +143,7 @@ def order_detail_page(order_id: str):
             with ui.row().classes('justify-between items-center w-full border-b pb-3 mb-4'):
                 ui.label(f"Номер заказа: #{order['order_id']}").classes('text-lg font-semibold')
                 ui.label(f"Дата: {order['order_date']}").classes('text-sm text-gray-500')
+                ui.label('Закрыт' if order['is_closed'] else 'Открыт').classes('text-sm' + (' text-red-500' if order['is_closed'] else ' text-green-500'))
 
             if buyer_profile:
                 with ui.link(target=f'/profile/{buyer_profile["id"]}').classes('font-semibold no-underline hover:underline text-primary'):
@@ -162,3 +164,6 @@ def order_detail_page(order_id: str):
 
             with ui.row().classes('mt-6 justify-end w-full'):
                 ui.button('Назад к списку заказов', on_click=lambda: ui.navigate.back()).props('outline color=primary').classes('px-4 py-2')
+                
+                if IS_USER_SELLER() or IS_USER_ADMIN():
+                    ui.button('Изменить статус заказа', on_click=lambda: update_order_status(order['order_id'])).props('color=secondary').classes('px-4 py-2')
