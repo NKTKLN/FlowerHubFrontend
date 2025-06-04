@@ -1,6 +1,8 @@
+import time
 from nicegui import app, ui
 from app.utils import USER_AUTH_TOKEN, IS_LOGGED_IN, IS_USER_SELLER, IS_MOBILE, IS_USER_ADMIN
 from app.services import get_orders, get_order_by_id, get_flower_data, get_seller_orders, get_profile_by_id, get_admin_orders, update_order_status
+from app.components import navbar
 
 @ui.page('/orders')
 def orders_page():
@@ -166,4 +168,17 @@ def order_detail_page(order_id: str):
                 ui.button('Назад к списку заказов', on_click=lambda: ui.navigate.back()).props('outline color=primary').classes('px-4 py-2')
                 
                 if IS_USER_SELLER() or IS_USER_ADMIN():
-                    ui.button('Изменить статус заказа', on_click=lambda: update_order_status(order['order_id'])).props('color=secondary').classes('px-4 py-2')
+                    def update_status(token: str, order_id: int):
+                        try:
+                            response = update_order_status(token, order_id)
+                            if response.get('detail') == 'Данные заказа успешно обновлены':
+                                ui.notify('Статус заказа успешно обновлен', color='green')
+                                time.sleep(1)
+                                ui.navigate.to(f"/order/{order['order_id']}")
+                            else:
+                                ui.notify('Ошибка при обновлении статуса заказа', color='red')
+                        except Exception as e:
+                            ui.notify(f'Ошибка: {str(e)}', color='red')
+
+                    ui.button('Изменить статус заказа', on_click=lambda: update_status(USER_AUTH_TOKEN(), order['order_id'])).props('color=secondary').classes('px-4 py-2')
+    
