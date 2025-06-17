@@ -1,6 +1,6 @@
 from nicegui import ui, app
 from app.components import navbar
-from app.services import get_flower_data, reference, get_profile_by_id, get_profile, delete_flower, update_cart
+from app.services import get_flower_data, reference, get_profile_by_id, get_profile, delete_flower, update_cart, get_cart
 from fastapi import Request
 
 from app.utils.sates import IS_MOBILE, IS_USER_SELLER, IS_LOGGED_IN, USER_AUTH_TOKEN, IS_USER_ADMIN
@@ -109,25 +109,23 @@ def render_flower_card(flower):
                             .classes('whitespace-nowrap delete-btn')
 
             if IS_LOGGED_IN() and not (IS_USER_SELLER() or IS_USER_ADMIN()):
-                cart = app.storage.user.get('cart', {})
+                cart = get_cart(USER_AUTH_TOKEN())
                 quantity = cart.get(str(flower['id']), 0)
 
                 def create_controls(fid):
                     with ui.row().classes('items-center gap-2 whitespace-nowrap'):
                         def on_minus():
-                            cart = app.storage.user.get('cart', {})
+                            cart = get_cart(USER_AUTH_TOKEN())
                             current = cart.get(str(fid), 0)
                             if current > 0:
                                 cart[str(fid)] = current - 1
-                                app.storage.user['cart'] = cart
                                 update_cart(USER_AUTH_TOKEN(), cart)
                                 update_ui()
 
                         def on_plus():
-                            cart = app.storage.user.get('cart', {})
+                            cart = get_cart(USER_AUTH_TOKEN())
                             current = cart.get(str(fid), 0)
                             cart[str(fid)] = current + 1
-                            app.storage.user['cart'] = cart
                             update_cart(USER_AUTH_TOKEN(), cart)
                             update_ui()
 

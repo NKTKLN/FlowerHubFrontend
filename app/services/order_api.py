@@ -27,7 +27,7 @@ def get_orders(token: str) -> dict:
 def update_cart(token: str, cart_data: dict) -> dict:
     check_and_refresh_token(token)
     with httpx.Client() as client:
-        response = client.post(f"{API_URL}/order/cart", headers={"X-Token": token}, json=cart_data)
+        response = client.post(f"{API_URL}/order/cart", headers={"X-Token": token}, json={"cart": cart_data})
         return response.json()
 
 def get_cart(token: str) -> dict:

@@ -1,6 +1,6 @@
 from nicegui import app, ui
 from app.services import seller_add_flower as seller_add_flower_api
-from app.services import reference, get_flower_data, create_order, get_cart
+from app.services import reference, get_flower_data, create_order, get_cart, update_cart
 from app.utils import USER_AUTH_TOKEN, IS_LOGGED_IN, IS_USER_SELLER
 from app.components import navbar, load_reference_data
 
@@ -12,10 +12,6 @@ def cart_page():
         ui.navigate.to('/')
         return
     
-    app.storage.user['cart'] = get_cart(USER_AUTH_TOKEN())
-    if 'cart' not in app.storage.user:
-        app.storage.user['cart'] = {}
-
     with ui.column().classes('w-full p-6 gap-6 max-w-7xl mx-auto'):
         ui.label('Корзина').classes('text-3xl font-bold mb-2')
 
@@ -23,7 +19,7 @@ def cart_page():
         total_price_label = ui.label('Итого: 0 ₽').classes('text-xl font-bold mt-4 text-primary')
 
         def update_cart_ui():
-            cart = dict(app.storage.user.get('cart', {}))
+            cart = dict(get_cart(USER_AUTH_TOKEN()))
             cart_container.clear()
             total_price = 0
 
@@ -62,20 +58,20 @@ def cart_page():
 
                         with ui.row().classes('items-center gap-2 whitespace-nowrap'):
                             def on_minus(fid=fid):
-                                cart = app.storage.user.get('cart', {})
+                                cart = get_cart(USER_AUTH_TOKEN())
                                 current = cart.get(str(fid), 0)
                                 if current > 0:
                                     cart[str(fid)] = current - 1
                                     if cart[str(fid)] == 0:
                                         del cart[str(fid)]
-                                    app.storage.user['cart'] = cart
+                                    update_cart(USER_AUTH_TOKEN(), cart)
                                     update_cart_ui()
 
                             def on_plus(fid=fid):
-                                cart = app.storage.user.get('cart', {})
+                                cart = get_cart(USER_AUTH_TOKEN())
                                 current = cart.get(str(fid), 0)
                                 cart[str(fid)] = current + 1
-                                app.storage.user['cart'] = cart
+                                update_cart(USER_AUTH_TOKEN(), cart)
                                 update_cart_ui()
 
                             ui.button(icon="remove", on_click=on_minus).props('dense outline size=sm color=secondary').classes('delete-btn')
@@ -88,11 +84,11 @@ def cart_page():
             total_price_label.set_text(f'Итого: {total_price} ₽')
 
         def clear_cart():
-            app.storage.user['cart'] = {}
+            update_cart(USER_AUTH_TOKEN(), {})
             update_cart_ui()
 
         def place_order():
-            cart = app.storage.user.get('cart', {})
+            cart = get_cart(USER_AUTH_TOKEN())
             if not cart:
                 ui.notify('Корзина пуста!', type='negative')
                 return
