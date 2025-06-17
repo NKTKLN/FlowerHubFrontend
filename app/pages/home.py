@@ -1,6 +1,6 @@
 from nicegui import ui, app
 from app.components import navbar
-from app.services import get_flower_data, reference, get_profile_by_id, get_profile, delete_flower
+from app.services import get_flower_data, reference, get_profile_by_id, get_profile, delete_flower, update_cart
 from fastapi import Request
 
 from app.utils.sates import IS_MOBILE, IS_USER_SELLER, IS_LOGGED_IN, USER_AUTH_TOKEN, IS_USER_ADMIN
@@ -120,6 +120,7 @@ def render_flower_card(flower):
                             if current > 0:
                                 cart[str(fid)] = current - 1
                                 app.storage.user['cart'] = cart
+                                update_cart(USER_AUTH_TOKEN(), cart)
                                 update_ui()
 
                         def on_plus():
@@ -127,6 +128,7 @@ def render_flower_card(flower):
                             current = cart.get(str(fid), 0)
                             cart[str(fid)] = current + 1
                             app.storage.user['cart'] = cart
+                            update_cart(USER_AUTH_TOKEN(), cart)
                             update_ui()
 
                         def update_ui():

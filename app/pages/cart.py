@@ -1,6 +1,6 @@
 from nicegui import app, ui
 from app.services import seller_add_flower as seller_add_flower_api
-from app.services import reference, get_flower_data, create_order
+from app.services import reference, get_flower_data, create_order, get_cart
 from app.utils import USER_AUTH_TOKEN, IS_LOGGED_IN, IS_USER_SELLER
 from app.components import navbar, load_reference_data
 
@@ -12,6 +12,7 @@ def cart_page():
         ui.navigate.to('/')
         return
     
+    app.storage.user['cart'] = get_cart(USER_AUTH_TOKEN())
     if 'cart' not in app.storage.user:
         app.storage.user['cart'] = {}
 
